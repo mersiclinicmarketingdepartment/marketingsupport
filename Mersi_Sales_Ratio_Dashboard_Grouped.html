@@ -1,0 +1,2450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mersi Clinic Sales Ratio Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --mint:#00b499;
+  --mint-dark:#057a72;
+  --gold:#c9a227;
+  --green-soft:#e9fff8;
+  --bg:#f3f8f7;
+  --ink:#173331;
+  --muted:#6b7d7a;
+  --danger:#dc2626;
+  --danger-bg:#fff0f0;
+  --caution:#d97706;
+  --caution-bg:#fff7e6;
+  --safe:#0f9f6e;
+  --safe-bg:#eafff4;
+  --card:#ffffff;
+  --line:#e7eeee;
+  --shadow:0 18px 48px rgba(15, 76, 72, .10);
+}
+*{box-sizing:border-box}
+body {
+  margin:0;
+  font-family:'Noto Sans Thai', Arial, sans-serif;
+  background:
+    radial-gradient(circle at 10% 0%, rgba(0,180,153,.17), transparent 32%),
+    radial-gradient(circle at 90% 8%, rgba(201,162,39,.14), transparent 28%),
+    linear-gradient(180deg, #f8fffd 0%, var(--bg) 100%);
+  color:var(--ink);
+}
+.container{max-width:1480px;margin:0 auto;padding:28px}
+.hero{
+  border-radius:30px;
+  padding:32px;
+  background:linear-gradient(135deg, #063d3a 0%, #087f75 58%, #00b499 100%);
+  color:#fff;
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  width:360px;height:360px;border-radius:50%;
+  right:-90px;top:-130px;
+  background:rgba(255,255,255,.14);
+}
+.hero h1{margin:0;font-size:34px;line-height:1.25;font-weight:800;letter-spacing:-.5px}
+.hero p{margin:10px 0 0;opacity:.92;font-size:17px}
+.hero .rule{display:inline-flex;gap:8px;align-items:center;margin-top:18px;background:rgba(255,255,255,.16);padding:10px 14px;border-radius:999px;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:22px 0}
+.kpi{background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.8);border-radius:22px;padding:20px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
+.kpi .label{color:var(--muted);font-size:13px;font-weight:700}
+.kpi .value{font-size:30px;font-weight:800;margin-top:6px;color:var(--ink)}
+.kpi .sub{font-size:13px;color:var(--muted);margin-top:4px}
+.group{margin-top:34px}
+.group-head{
+  display:flex;justify-content:space-between;gap:20px;align-items:flex-end;
+  padding:22px 24px;border-radius:24px 24px 0 0;
+  background:linear-gradient(135deg, #ffffff 0%, #eefdf8 100%);
+  border:1px solid var(--line);border-bottom:none;
+}
+.group-title h2{margin:0;font-size:24px}
+.group-title p{margin:5px 0 0;color:var(--muted)}
+.group-badge{background:#073f3a;color:#fff;padding:10px 14px;border-radius:999px;font-weight:800;white-space:nowrap}
+.branch{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-top:none;
+  padding:22px 24px 26px;
+}
+.branch + .branch{border-top:1px solid var(--line)}
+.branch h3{margin:0 0 14px;font-size:20px;display:flex;align-items:center;gap:8px;color:#075e57}
+.branch-stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:7px 11px;border-radius:999px;background:#f5faf9;color:#3c5652;font-size:13px;font-weight:700;border:1px solid #e2efed}
+.table-wrap{overflow-x:auto;border-radius:16px;border:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;min-width:850px;background:#fff}
+th{background:#073f3a;color:white;text-align:left;padding:12px;font-size:13px;white-space:nowrap}
+td{padding:12px;border-bottom:1px solid #edf2f1;font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+.employee{font-weight:500}
+.money{font-variant-numeric:tabular-nums;color:#405b57}
+.percent{font-weight:800;font-variant-numeric:tabular-nums}
+.progress{height:10px;background:#eef4f3;border-radius:99px;overflow:hidden;margin-top:7px;width:160px}
+.progress span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--mint),#44dec5)}
+.status{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;white-space:nowrap}
+.status.danger{background:var(--danger-bg);color:var(--danger)}
+.status.caution{background:var(--caution-bg);color:var(--caution)}
+.status.safe{background:var(--safe-bg);color:var(--safe)}
+.row-danger{background:linear-gradient(90deg, rgba(220,38,38,.08), transparent)}
+.row-caution{background:linear-gradient(90deg, rgba(217,119,6,.07), transparent)}
+.summary{
+  border-radius:0 0 24px 24px;
+  padding:24px;
+  background:linear-gradient(135deg,#073f3a 0%,#0b6f66 100%);
+  color:white;
+  box-shadow:var(--shadow);
+}
+.summary-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:18px}
+.summary-card{background:rgba(255,255,255,.12);padding:16px;border-radius:18px;border:1px solid rgba(255,255,255,.18)}
+.summary-card .label{font-size:12px;opacity:.82;font-weight:700}
+.summary-card .value{font-size:24px;font-weight:800;margin-top:3px}
+.analysis-box{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:18px;line-height:1.65}
+.analysis-box b{color:#fff2b3}
+.empty{padding:18px;border:1px dashed #cbd9d7;border-radius:16px;color:var(--muted);background:#f9fcfb}
+.footer{text-align:center;color:var(--muted);font-size:13px;margin:34px 0 10px}
+@media(max-width:1000px){
+  .kpis,.summary-grid{grid-template-columns:repeat(2,1fr)}
+  .group-head{display:block}
+  .group-badge{display:inline-flex;margin-top:12px}
+}
+@media(max-width:640px){
+  .container{padding:16px}
+  .hero{padding:24px}
+  .hero h1{font-size:26px}
+  .kpis,.summary-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <section class="hero">
+    <h1>📊 Mersi Clinic Sales Mix Dashboard</h1>
+    <p>สรุปสัดส่วนยอดขายลูกค้าเก่า vs ลูกค้าใหม่ รายพนักงาน แยกตามกลุ่มสาขา</p>
+    <div class="rule">🚨 เกณฑ์เฝ้าระวัง: สัดส่วนยอดขายจากลูกค้าเก่า ต่ำกว่า 30%</div>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><div class="label">พนักงานทั้งหมด</div><div class="value">206</div><div class="sub">คน จากทุกสาขาในไฟล์</div></div>
+    <div class="kpi"><div class="label">พนักงานเฝ้าระวัง</div><div class="value" style="color:var(--danger)">68</div><div class="sub">ลูกค้าเก่า &lt; 30%</div></div>
+    <div class="kpi"><div class="label">สัดส่วนลูกค้าเก่าทั้งองค์กร</div><div class="value">44.7%</div><div class="sub">คำนวณจากยอดขายรวม</div></div>
+    <div class="kpi"><div class="label">ยอดขายรวมในข้อมูล</div><div class="value">18,491,458</div><div class="sub">ลูกค้าเก่า + ลูกค้าใหม่</div></div>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">
+        <h2>🏆 กลุ่มที่ 1: กลุ่มสาขาหลัก 4 สาขา</h2>
+        <p>พระราม 2 • บางนา • อุดรธานี • บางแค</p>
+      </div>
+      <div class="group-badge">สรุปกลุ่ม 1</div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 พระราม 2</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 12 คน</span>
+        <span class="pill">เฝ้าระวัง 4 คน</span>
+        <span class="pill">ลูกค้าเก่า 48.0%</span>
+        <span class="pill">ลูกค้าใหม่ 52.0%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">นารีรัตน์ บูญสดา (นัทตี)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ชยาภัสร์ จงสมาน (แคท)</td>
+            <td class="money">2,370</td>
+            <td><div class="percent">7.6%</div><div class="progress"><span style="width:7.6%"></span></div></td>
+            <td class="money">28,829</td>
+            <td><div class="percent">92.4%</div><div class="progress"><span style="width:92.4%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">นงนุช ผณินทรารักษ์ (เปิ้ล)</td>
+            <td class="money">3,500</td>
+            <td><div class="percent">21.1%</div><div class="progress"><span style="width:21.1%"></span></div></td>
+            <td class="money">13,120</td>
+            <td><div class="percent">78.9%</div><div class="progress"><span style="width:78.9%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พรธิดา พรมป้อง ( ปาล์มมี่ )</td>
+            <td class="money">46,705</td>
+            <td><div class="percent">21.6%</div><div class="progress"><span style="width:21.6%"></span></div></td>
+            <td class="money">169,240</td>
+            <td><div class="percent">78.4%</div><div class="progress"><span style="width:78.4%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">กัณณิกา แสนสุด (เอ๋)</td>
+            <td class="money">4,410</td>
+            <td><div class="percent">39.7%</div><div class="progress"><span style="width:39.7%"></span></div></td>
+            <td class="money">6,690</td>
+            <td><div class="percent">60.3%</div><div class="progress"><span style="width:60.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กัญชพร ฐานโอภาส (แพต)</td>
+            <td class="money">110,483</td>
+            <td><div class="percent">48.8%</div><div class="progress"><span style="width:48.8%"></span></div></td>
+            <td class="money">115,711</td>
+            <td><div class="percent">51.2%</div><div class="progress"><span style="width:51.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ธีระวัฒน์ สร้อยมุข (เต้)</td>
+            <td class="money">203,135</td>
+            <td><div class="percent">49.5%</div><div class="progress"><span style="width:49.5%"></span></div></td>
+            <td class="money">207,388</td>
+            <td><div class="percent">50.5%</div><div class="progress"><span style="width:50.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">บัวศิลา แก้วอินทร์ (บัว)</td>
+            <td class="money">3,000</td>
+            <td><div class="percent">60.0%</div><div class="progress"><span style="width:60.0%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">40.0%</div><div class="progress"><span style="width:40.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อรทัย ศรีน้อย (พิมพ์)</td>
+            <td class="money">7,010</td>
+            <td><div class="percent">69.4%</div><div class="progress"><span style="width:69.4%"></span></div></td>
+            <td class="money">3,090</td>
+            <td><div class="percent">30.6%</div><div class="progress"><span style="width:30.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ชญาน์นันท์ อิ่มสมบูรณ์ (นันท์)</td>
+            <td class="money">143,483</td>
+            <td><div class="percent">74.1%</div><div class="progress"><span style="width:74.1%"></span></div></td>
+            <td class="money">50,210</td>
+            <td><div class="percent">25.9%</div><div class="progress"><span style="width:25.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">แพรวแพรวา อัคระกรวิกรัย (ดา)</td>
+            <td class="money">26,019</td>
+            <td><div class="percent">95.9%</div><div class="progress"><span style="width:95.9%"></span></div></td>
+            <td class="money">1,100</td>
+            <td><div class="percent">4.1%</div><div class="progress"><span style="width:4.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ยุวรรณดา จันทร์เจริญ (จุ๊บแจง)</td>
+            <td class="money">2,300</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 บางนา</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 15 คน</span>
+        <span class="pill">เฝ้าระวัง 5 คน</span>
+        <span class="pill">ลูกค้าเก่า 46.3%</span>
+        <span class="pill">ลูกค้าใหม่ 53.7%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">อ้อยใจ สุประทัศ (อ้อย)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ฉัตรกมล ณ น่าน (ทิพย์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">มารยาท อับดุลรอศักดิ์ (น้ำหวาน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ดาริตา ภัครัตนภูวดล (กี้)</td>
+            <td class="money">74,130</td>
+            <td><div class="percent">25.7%</div><div class="progress"><span style="width:25.7%"></span></div></td>
+            <td class="money">214,740</td>
+            <td><div class="percent">74.3%</div><div class="progress"><span style="width:74.3%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ดลภา ปาณาพงษ์ (ปู)</td>
+            <td class="money">7,050</td>
+            <td><div class="percent">26.1%</div><div class="progress"><span style="width:26.1%"></span></div></td>
+            <td class="money">20,000</td>
+            <td><div class="percent">73.9%</div><div class="progress"><span style="width:73.9%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ทัศนีย์ ลุณบุตร (จีจี้)</td>
+            <td class="money">185,060</td>
+            <td><div class="percent">41.3%</div><div class="progress"><span style="width:41.3%"></span></div></td>
+            <td class="money">262,995</td>
+            <td><div class="percent">58.7%</div><div class="progress"><span style="width:58.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">วิภาดา คงเจริญ (พลอยสวย)</td>
+            <td class="money">15,150</td>
+            <td><div class="percent">43.6%</div><div class="progress"><span style="width:43.6%"></span></div></td>
+            <td class="money">19,590</td>
+            <td><div class="percent">56.4%</div><div class="progress"><span style="width:56.4%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พัสวี พวงทอง (เกรซ)</td>
+            <td class="money">55,127</td>
+            <td><div class="percent">45.2%</div><div class="progress"><span style="width:45.2%"></span></div></td>
+            <td class="money">66,940</td>
+            <td><div class="percent">54.8%</div><div class="progress"><span style="width:54.8%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กฤษณา อ่อนเกตุพล (จ๋อมแจ๋ม)</td>
+            <td class="money">10,540</td>
+            <td><div class="percent">54.5%</div><div class="progress"><span style="width:54.5%"></span></div></td>
+            <td class="money">8,800</td>
+            <td><div class="percent">45.5%</div><div class="progress"><span style="width:45.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นริสา เปลี่ยสาร (สาลี่)</td>
+            <td class="money">26,800</td>
+            <td><div class="percent">59.7%</div><div class="progress"><span style="width:59.7%"></span></div></td>
+            <td class="money">18,090</td>
+            <td><div class="percent">40.3%</div><div class="progress"><span style="width:40.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุธิดา พันธ์เนียม (แพท)</td>
+            <td class="money">121,790</td>
+            <td><div class="percent">60.3%</div><div class="progress"><span style="width:60.3%"></span></div></td>
+            <td class="money">80,110</td>
+            <td><div class="percent">39.7%</div><div class="progress"><span style="width:39.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นูพิศ สีหานนท์ (น้อย)</td>
+            <td class="money">14,680</td>
+            <td><div class="percent">60.5%</div><div class="progress"><span style="width:60.5%"></span></div></td>
+            <td class="money">9,600</td>
+            <td><div class="percent">39.5%</div><div class="progress"><span style="width:39.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุพรรณษา ศรีสงคราม (ปันปัน)</td>
+            <td class="money">167,145</td>
+            <td><div class="percent">63.5%</div><div class="progress"><span style="width:63.5%"></span></div></td>
+            <td class="money">96,145</td>
+            <td><div class="percent">36.5%</div><div class="progress"><span style="width:36.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">วรินธร มีปิ่น (เบียร์)</td>
+            <td class="money">6,000</td>
+            <td><div class="percent">85.7%</div><div class="progress"><span style="width:85.7%"></span></div></td>
+            <td class="money">1,000</td>
+            <td><div class="percent">14.3%</div><div class="progress"><span style="width:14.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">จุฬารัตน์ ม่านทอง (โบว์)</td>
+            <td class="money">5,500</td>
+            <td><div class="percent">91.7%</div><div class="progress"><span style="width:91.7%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">8.3%</div><div class="progress"><span style="width:8.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 อุดรธานี</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 13 คน</span>
+        <span class="pill">เฝ้าระวัง 3 คน</span>
+        <span class="pill">ลูกค้าเก่า 39.2%</span>
+        <span class="pill">ลูกค้าใหม่ 60.8%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">ณัฐพร คำโคตร (แอน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ธนิดา คำเหมือน (เอ๋)</td>
+            <td class="money">8,665</td>
+            <td><div class="percent">13.6%</div><div class="progress"><span style="width:13.6%"></span></div></td>
+            <td class="money">54,834</td>
+            <td><div class="percent">86.4%</div><div class="progress"><span style="width:86.4%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ธารีรัตน์ นิชรัตน์ (ปอ)</td>
+            <td class="money">26,595</td>
+            <td><div class="percent">27.1%</div><div class="progress"><span style="width:27.1%"></span></div></td>
+            <td class="money">71,675</td>
+            <td><div class="percent">72.9%</div><div class="progress"><span style="width:72.9%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ชนนิกานต์ ศิริจันทร์ (กาน)</td>
+            <td class="money">3,600</td>
+            <td><div class="percent">35.2%</div><div class="progress"><span style="width:35.2%"></span></div></td>
+            <td class="money">6,630</td>
+            <td><div class="percent">64.8%</div><div class="progress"><span style="width:64.8%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ชุติกาญจน์ เชื้อกลางใหญ่ (เพลง)</td>
+            <td class="money">65,585</td>
+            <td><div class="percent">35.3%</div><div class="progress"><span style="width:35.3%"></span></div></td>
+            <td class="money">120,405</td>
+            <td><div class="percent">64.7%</div><div class="progress"><span style="width:64.7%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">อรทัย จิระสถิตย์ (นิว)</td>
+            <td class="money">131,125</td>
+            <td><div class="percent">37.0%</div><div class="progress"><span style="width:37.0%"></span></div></td>
+            <td class="money">223,113</td>
+            <td><div class="percent">63.0%</div><div class="progress"><span style="width:63.0%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">จิราภรณ์ เปละกันยา (ทอง)</td>
+            <td class="money">7,690</td>
+            <td><div class="percent">39.1%</div><div class="progress"><span style="width:39.1%"></span></div></td>
+            <td class="money">11,990</td>
+            <td><div class="percent">60.9%</div><div class="progress"><span style="width:60.9%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุมาตา บรรพจันทร์ (จูน)</td>
+            <td class="money">6,070</td>
+            <td><div class="percent">47.1%</div><div class="progress"><span style="width:47.1%"></span></div></td>
+            <td class="money">6,830</td>
+            <td><div class="percent">52.9%</div><div class="progress"><span style="width:52.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กัญญารัตน์ เสลิมนอก (ไอน้ำ )</td>
+            <td class="money">63,940</td>
+            <td><div class="percent">48.5%</div><div class="progress"><span style="width:48.5%"></span></div></td>
+            <td class="money">67,950</td>
+            <td><div class="percent">51.5%</div><div class="progress"><span style="width:51.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">วิชชุลดา แปงชมภู (ก๊อปแก๊ป)</td>
+            <td class="money">7,415</td>
+            <td><div class="percent">65.0%</div><div class="progress"><span style="width:65.0%"></span></div></td>
+            <td class="money">4,000</td>
+            <td><div class="percent">35.0%</div><div class="progress"><span style="width:35.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กัญญ่รัตน์ ศรีประทุม (พอร์ช)</td>
+            <td class="money">33,615</td>
+            <td><div class="percent">70.5%</div><div class="progress"><span style="width:70.5%"></span></div></td>
+            <td class="money">14,040</td>
+            <td><div class="percent">29.5%</div><div class="progress"><span style="width:29.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">รัชนีกร หนองโทน (แพ็บ)</td>
+            <td class="money">19,925</td>
+            <td><div class="percent">89.9%</div><div class="progress"><span style="width:89.9%"></span></div></td>
+            <td class="money">2,250</td>
+            <td><div class="percent">10.1%</div><div class="progress"><span style="width:10.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สกุลตลา รักพลแสน (ซัน)</td>
+            <td class="money">1,345</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 บางแค</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 16 คน</span>
+        <span class="pill">เฝ้าระวัง 7 คน</span>
+        <span class="pill">ลูกค้าเก่า 28.9%</span>
+        <span class="pill">ลูกค้าใหม่ 71.1%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">พรพิมล เพ็งวงศ์ (ฟ้า)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">กัณณิกา แสนสุด (เอ๋)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">บัวศิลา แก้วอินทร์ (บัวซี่)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">สุทธิดา ช่างเก็บ (น้ำหวาน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">นที สินธุสนธ์ (เพ้นท์)</td>
+            <td class="money">21,752</td>
+            <td><div class="percent">9.4%</div><div class="progress"><span style="width:9.4%"></span></div></td>
+            <td class="money">210,464</td>
+            <td><div class="percent">90.6%</div><div class="progress"><span style="width:90.6%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">กมลชนก พุ่มน้ำเย็น (โจโจ้)</td>
+            <td class="money">38,583</td>
+            <td><div class="percent">17.5%</div><div class="progress"><span style="width:17.5%"></span></div></td>
+            <td class="money">181,535</td>
+            <td><div class="percent">82.5%</div><div class="progress"><span style="width:82.5%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">อัมพร สีชน (แพรว)</td>
+            <td class="money">6,970</td>
+            <td><div class="percent">21.3%</div><div class="progress"><span style="width:21.3%"></span></div></td>
+            <td class="money">25,710</td>
+            <td><div class="percent">78.7%</div><div class="progress"><span style="width:78.7%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">วรรณรัตน์ สมานพันธ์ (นิว)</td>
+            <td class="money">14,590</td>
+            <td><div class="percent">30.5%</div><div class="progress"><span style="width:30.5%"></span></div></td>
+            <td class="money">33,280</td>
+            <td><div class="percent">69.5%</div><div class="progress"><span style="width:69.5%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ปิยาภรณ์ คชินทร(ฝน)</td>
+            <td class="money">12,870</td>
+            <td><div class="percent">31.6%</div><div class="progress"><span style="width:31.6%"></span></div></td>
+            <td class="money">27,820</td>
+            <td><div class="percent">68.4%</div><div class="progress"><span style="width:68.4%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปภัสรา บุญรอด (ลูกปลา)</td>
+            <td class="money">39,978</td>
+            <td><div class="percent">42.5%</div><div class="progress"><span style="width:42.5%"></span></div></td>
+            <td class="money">54,170</td>
+            <td><div class="percent">57.5%</div><div class="progress"><span style="width:57.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พัทธนันท์ ศุภกิจจาธร (ไอ)</td>
+            <td class="money">85,269</td>
+            <td><div class="percent">47.7%</div><div class="progress"><span style="width:47.7%"></span></div></td>
+            <td class="money">93,525</td>
+            <td><div class="percent">52.3%</div><div class="progress"><span style="width:52.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุกัญญา แดงลา (ต่าย)</td>
+            <td class="money">10,550</td>
+            <td><div class="percent">51.9%</div><div class="progress"><span style="width:51.9%"></span></div></td>
+            <td class="money">9,790</td>
+            <td><div class="percent">48.1%</div><div class="progress"><span style="width:48.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุริยภา เสือรอด (แพร)</td>
+            <td class="money">34,060</td>
+            <td><div class="percent">52.9%</div><div class="progress"><span style="width:52.9%"></span></div></td>
+            <td class="money">30,280</td>
+            <td><div class="percent">47.1%</div><div class="progress"><span style="width:47.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ลักษ์คณา จันเทา (หนูนา)</td>
+            <td class="money">3,190</td>
+            <td><div class="percent">65.4%</div><div class="progress"><span style="width:65.4%"></span></div></td>
+            <td class="money">1,690</td>
+            <td><div class="percent">34.6%</div><div class="progress"><span style="width:34.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุชาวดี เซี่ยงหลิว (หยิน)</td>
+            <td class="money">1,700</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">เกวลิน บุญยงค์ (ผักผัก)</td>
+            <td class="money">3,380</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-grid">
+        <div class="summary-card"><div class="label">จำนวนพนักงานในกลุ่มนี้</div><div class="value">56 คน</div></div>
+        <div class="summary-card"><div class="label">จำนวนที่น่าเป็นห่วง</div><div class="value">19 คน</div></div>
+        <div class="summary-card"><div class="label">อัตราเสี่ยงของกลุ่ม</div><div class="value">33.9%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าเก่า</div><div class="value">41.6%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าใหม่</div><div class="value">58.4%</div></div>
+      </div>
+      <div class="analysis-box">
+        <b>สรุปสถานการณ์:</b> สถานการณ์ควรติดตามใกล้ชิด — พบพนักงานที่น่าเป็นห่วง 19 คน จากทั้งหมด 56 คน ในกลุ่มสาขานี้<br>
+        <b>แนวทางแก้ไข:</b> ควรติดตามรายสัปดาห์: แยกลิสต์ลูกค้าเก่าที่ไม่ได้กลับมา, ให้พนักงานโทร/แชทติดตามหลังบริการ, วางโปรแกรมดูแลต่อเนื่อง และให้ผู้จัดการเช็กสัดส่วนลูกค้าเก่ารายบุคคลทุก 3 วัน
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">
+        <h2>📍 กลุ่มที่ 2: กลุ่มสาขาเมืองและโซนตะวันออก 5 สาขา</h2>
+        <p>อนุสาวรีย์ชัยสมรภูมิ • รามอินทรา 109 • รังสิต • ลาดกระบัง • ปากเกร็ด</p>
+      </div>
+      <div class="group-badge">สรุปกลุ่ม 2</div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 อนุสาวรีย์ชัยสมรภูมิ</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 15 คน</span>
+        <span class="pill">เฝ้าระวัง 6 คน</span>
+        <span class="pill">ลูกค้าเก่า 31.1%</span>
+        <span class="pill">ลูกค้าใหม่ 68.9%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">นริศรา เรืองพริ้ม (มายด์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">กฤติยา แสงแก้ว (นิว)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">รังศิมา อินทปัทม์ (ลูกหยี)</td>
+            <td class="money">690</td>
+            <td><div class="percent">10.6%</div><div class="progress"><span style="width:10.6%"></span></div></td>
+            <td class="money">5,795</td>
+            <td><div class="percent">89.4%</div><div class="progress"><span style="width:89.4%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พรสินี แจ้งขำ (โบว์)</td>
+            <td class="money">17,160</td>
+            <td><div class="percent">17.3%</div><div class="progress"><span style="width:17.3%"></span></div></td>
+            <td class="money">82,005</td>
+            <td><div class="percent">82.7%</div><div class="progress"><span style="width:82.7%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ปวริศา ตะเหลม (ใบตอง)</td>
+            <td class="money">6,000</td>
+            <td><div class="percent">24.5%</div><div class="progress"><span style="width:24.5%"></span></div></td>
+            <td class="money">18,500</td>
+            <td><div class="percent">75.5%</div><div class="progress"><span style="width:75.5%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">อริสา กุลราช (ตุ๊กตา)</td>
+            <td class="money">85,990</td>
+            <td><div class="percent">26.3%</div><div class="progress"><span style="width:26.3%"></span></div></td>
+            <td class="money">240,530</td>
+            <td><div class="percent">73.7%</div><div class="progress"><span style="width:73.7%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ทิพภาภรณ์ โนนสืบเผ่า (ก้อย)</td>
+            <td class="money">14,010</td>
+            <td><div class="percent">32.1%</div><div class="progress"><span style="width:32.1%"></span></div></td>
+            <td class="money">29,640</td>
+            <td><div class="percent">67.9%</div><div class="progress"><span style="width:67.9%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ไอรยภัสสร์ สัมพิพัฒนุปกฤต (ทราย)</td>
+            <td class="money">8,025</td>
+            <td><div class="percent">33.1%</div><div class="progress"><span style="width:33.1%"></span></div></td>
+            <td class="money">16,255</td>
+            <td><div class="percent">66.9%</div><div class="progress"><span style="width:66.9%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">รัชนีกร เมืองจันทร์ (ต้าร์)</td>
+            <td class="money">5,000</td>
+            <td><div class="percent">34.3%</div><div class="progress"><span style="width:34.3%"></span></div></td>
+            <td class="money">9,590</td>
+            <td><div class="percent">65.7%</div><div class="progress"><span style="width:65.7%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ปวีณา ทิพย์โพธิ์ (อ้อ)</td>
+            <td class="money">51,505</td>
+            <td><div class="percent">34.3%</div><div class="progress"><span style="width:34.3%"></span></div></td>
+            <td class="money">98,758</td>
+            <td><div class="percent">65.7%</div><div class="progress"><span style="width:65.7%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ศิริโชค นิลพัฒน์ (มะนาว)</td>
+            <td class="money">54,405</td>
+            <td><div class="percent">35.4%</div><div class="progress"><span style="width:35.4%"></span></div></td>
+            <td class="money">99,260</td>
+            <td><div class="percent">64.6%</div><div class="progress"><span style="width:64.6%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">หรรษา นิลฉ่ำ (ใบเฟิร์น)</td>
+            <td class="money">94,760</td>
+            <td><div class="percent">35.5%</div><div class="progress"><span style="width:35.5%"></span></div></td>
+            <td class="money">172,380</td>
+            <td><div class="percent">64.5%</div><div class="progress"><span style="width:64.5%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อาภาภรณ์ บุญยี่ (ด๊ะ)</td>
+            <td class="money">13,000</td>
+            <td><div class="percent">46.4%</div><div class="progress"><span style="width:46.4%"></span></div></td>
+            <td class="money">15,040</td>
+            <td><div class="percent">53.6%</div><div class="progress"><span style="width:53.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ชินวัตร จิตสว่าง (เตชิน)</td>
+            <td class="money">7,735</td>
+            <td><div class="percent">55.5%</div><div class="progress"><span style="width:55.5%"></span></div></td>
+            <td class="money">6,190</td>
+            <td><div class="percent">44.5%</div><div class="progress"><span style="width:44.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ขนิษฐา ศรีเทพ(แอน)</td>
+            <td class="money">500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 รามอินทรา 109</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 14 คน</span>
+        <span class="pill">เฝ้าระวัง 5 คน</span>
+        <span class="pill">ลูกค้าเก่า 44.0%</span>
+        <span class="pill">ลูกค้าใหม่ 56.0%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">กรรณิการ์ ฉาบสีทอง (ชีส)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">วิลาวัลย์ มาประเสริฐ (วิว)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พีรพัฒน์ ฉลาด (แนท)</td>
+            <td class="money">390</td>
+            <td><div class="percent">6.0%</div><div class="progress"><span style="width:6.0%"></span></div></td>
+            <td class="money">6,150</td>
+            <td><div class="percent">94.0%</div><div class="progress"><span style="width:94.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">อรญา พุทธา (อาย)</td>
+            <td class="money">2,500</td>
+            <td><div class="percent">19.5%</div><div class="progress"><span style="width:19.5%"></span></div></td>
+            <td class="money">10,300</td>
+            <td><div class="percent">80.5%</div><div class="progress"><span style="width:80.5%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">นิภาพร สีเนห์ (พิม)</td>
+            <td class="money">32,310</td>
+            <td><div class="percent">21.0%</div><div class="progress"><span style="width:21.0%"></span></div></td>
+            <td class="money">121,250</td>
+            <td><div class="percent">79.0%</div><div class="progress"><span style="width:79.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">วรวุฒิ ฆ้องกระแต (ฟลุ๊ค)</td>
+            <td class="money">57,955</td>
+            <td><div class="percent">30.2%</div><div class="progress"><span style="width:30.2%"></span></div></td>
+            <td class="money">133,880</td>
+            <td><div class="percent">69.8%</div><div class="progress"><span style="width:69.8%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">อมรา ชุ่มรัศมี (แหม่ม)</td>
+            <td class="money">4,630</td>
+            <td><div class="percent">32.8%</div><div class="progress"><span style="width:32.8%"></span></div></td>
+            <td class="money">9,500</td>
+            <td><div class="percent">67.2%</div><div class="progress"><span style="width:67.2%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">รินลดา สุวรรณโชติ (ฝน)</td>
+            <td class="money">69,875</td>
+            <td><div class="percent">34.4%</div><div class="progress"><span style="width:34.4%"></span></div></td>
+            <td class="money">133,085</td>
+            <td><div class="percent">65.6%</div><div class="progress"><span style="width:65.6%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">เมวลิน ยอมิน (เมล)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">35.1%</div><div class="progress"><span style="width:35.1%"></span></div></td>
+            <td class="money">3,690</td>
+            <td><div class="percent">64.9%</div><div class="progress"><span style="width:64.9%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พรธิดา วงค์สมบัติ (ปลาย)</td>
+            <td class="money">11,550</td>
+            <td><div class="percent">43.9%</div><div class="progress"><span style="width:43.9%"></span></div></td>
+            <td class="money">14,750</td>
+            <td><div class="percent">56.1%</div><div class="progress"><span style="width:56.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปิยะนุช ประชุมเหล็ก (แนน)</td>
+            <td class="money">14,010</td>
+            <td><div class="percent">51.0%</div><div class="progress"><span style="width:51.0%"></span></div></td>
+            <td class="money">13,470</td>
+            <td><div class="percent">49.0%</div><div class="progress"><span style="width:49.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สมฤทัย กลิ่นดารา (มะปราง)</td>
+            <td class="money">237,445</td>
+            <td><div class="percent">65.2%</div><div class="progress"><span style="width:65.2%"></span></div></td>
+            <td class="money">126,470</td>
+            <td><div class="percent">34.8%</div><div class="progress"><span style="width:34.8%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ศิริพร แจ้งสว่าง (ต้นอ้อ)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">66.7%</div><div class="progress"><span style="width:66.7%"></span></div></td>
+            <td class="money">1,000</td>
+            <td><div class="percent">33.3%</div><div class="progress"><span style="width:33.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พิมลรัตน์ พวงศรี (พิม)</td>
+            <td class="money">22,250</td>
+            <td><div class="percent">72.4%</div><div class="progress"><span style="width:72.4%"></span></div></td>
+            <td class="money">8,500</td>
+            <td><div class="percent">27.6%</div><div class="progress"><span style="width:27.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 รังสิต</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 17 คน</span>
+        <span class="pill">เฝ้าระวัง 7 คน</span>
+        <span class="pill">ลูกค้าเก่า 40.7%</span>
+        <span class="pill">ลูกค้าใหม่ 59.3%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">ณัชยาพร ดาวงษา(ขิง)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">5,480</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พิษณุ ต่อโชติ (ฟีฟ่า)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">สุรีรัตน์ ศิริสุวรรณ์ (ทราย)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">935</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">จณิสตา คชะ (จิว)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">1,195</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">เบญจฉัตร ภิระบรรณ (บี)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">8.7%</div><div class="progress"><span style="width:8.7%"></span></div></td>
+            <td class="money">20,945</td>
+            <td><div class="percent">91.3%</div><div class="progress"><span style="width:91.3%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ศศินา สุขแสนสุข (แจน)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">15.0%</div><div class="progress"><span style="width:15.0%"></span></div></td>
+            <td class="money">5,685</td>
+            <td><div class="percent">85.0%</div><div class="progress"><span style="width:85.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">สุรัสวดี ทองนุ้ย (ลูกปัด)</td>
+            <td class="money">101,900</td>
+            <td><div class="percent">29.9%</div><div class="progress"><span style="width:29.9%"></span></div></td>
+            <td class="money">239,280</td>
+            <td><div class="percent">70.1%</div><div class="progress"><span style="width:70.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ธนัฎฐา พงษ์พานิช (มาเบล)</td>
+            <td class="money">78,430</td>
+            <td><div class="percent">30.7%</div><div class="progress"><span style="width:30.7%"></span></div></td>
+            <td class="money">176,900</td>
+            <td><div class="percent">69.3%</div><div class="progress"><span style="width:69.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">สุรีรัตน์ แสนเก้า (เมล์)</td>
+            <td class="money">2,500</td>
+            <td><div class="percent">31.2%</div><div class="progress"><span style="width:31.2%"></span></div></td>
+            <td class="money">5,500</td>
+            <td><div class="percent">68.8%</div><div class="progress"><span style="width:68.8%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ดารณี ทศมาศ (รถเมล์)</td>
+            <td class="money">120,110</td>
+            <td><div class="percent">34.5%</div><div class="progress"><span style="width:34.5%"></span></div></td>
+            <td class="money">228,532</td>
+            <td><div class="percent">65.5%</div><div class="progress"><span style="width:65.5%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">จันทร์ทิมา ช่วยดู(เก๋ไก๋)</td>
+            <td class="money">62,625</td>
+            <td><div class="percent">38.2%</div><div class="progress"><span style="width:38.2%"></span></div></td>
+            <td class="money">101,427</td>
+            <td><div class="percent">61.8%</div><div class="progress"><span style="width:61.8%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ไพรสันต์ บาลภูมี (สปาย)</td>
+            <td class="money">100,095</td>
+            <td><div class="percent">39.7%</div><div class="progress"><span style="width:39.7%"></span></div></td>
+            <td class="money">152,320</td>
+            <td><div class="percent">60.3%</div><div class="progress"><span style="width:60.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุดารัตน์ บัวกอง (ดาด้า)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">42.1%</div><div class="progress"><span style="width:42.1%"></span></div></td>
+            <td class="money">2,750</td>
+            <td><div class="percent">57.9%</div><div class="progress"><span style="width:57.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภณิดาพร สงเนียม (ต้น)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">52.8%</div><div class="progress"><span style="width:52.8%"></span></div></td>
+            <td class="money">1,790</td>
+            <td><div class="percent">47.2%</div><div class="progress"><span style="width:47.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุจิตตรา ยอดลำไย (นุ่น)</td>
+            <td class="money">3,350</td>
+            <td><div class="percent">58.2%</div><div class="progress"><span style="width:58.2%"></span></div></td>
+            <td class="money">2,410</td>
+            <td><div class="percent">41.8%</div><div class="progress"><span style="width:41.8%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">รัตนาวดี ช่อฟ้า (อิง)</td>
+            <td class="money">271,740</td>
+            <td><div class="percent">61.6%</div><div class="progress"><span style="width:61.6%"></span></div></td>
+            <td class="money">169,205</td>
+            <td><div class="percent">38.4%</div><div class="progress"><span style="width:38.4%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นนชนันท์ เพาะบุญ (เตือน)</td>
+            <td class="money">27,090</td>
+            <td><div class="percent">68.1%</div><div class="progress"><span style="width:68.1%"></span></div></td>
+            <td class="money">12,700</td>
+            <td><div class="percent">31.9%</div><div class="progress"><span style="width:31.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 ลาดกระบัง</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 17 คน</span>
+        <span class="pill">เฝ้าระวัง 5 คน</span>
+        <span class="pill">ลูกค้าเก่า 41.4%</span>
+        <span class="pill">ลูกค้าใหม่ 58.6%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">วรรณวิศา แผงตัน (จอเจียร์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">สิริวิภาวรรณ เจื้อจิ๋ว (ฝ้าย)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พรวิภา นามแก้ม (แก้ม)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ณัฐพล สุขโภคา (มิก)</td>
+            <td class="money">42,721</td>
+            <td><div class="percent">27.9%</div><div class="progress"><span style="width:27.9%"></span></div></td>
+            <td class="money">110,244</td>
+            <td><div class="percent">72.1%</div><div class="progress"><span style="width:72.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">จันทร์วิภา เกือสีโท (ป๊อปปี้)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">29.9%</div><div class="progress"><span style="width:29.9%"></span></div></td>
+            <td class="money">2,350</td>
+            <td><div class="percent">70.1%</div><div class="progress"><span style="width:70.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ประกายแก้ว ว่องไว้ (นิด)</td>
+            <td class="money">89,238</td>
+            <td><div class="percent">34.5%</div><div class="progress"><span style="width:34.5%"></span></div></td>
+            <td class="money">169,155</td>
+            <td><div class="percent">65.5%</div><div class="progress"><span style="width:65.5%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">รจนา บุญเต็ม (ต้าร์)</td>
+            <td class="money">90,205</td>
+            <td><div class="percent">35.7%</div><div class="progress"><span style="width:35.7%"></span></div></td>
+            <td class="money">162,368</td>
+            <td><div class="percent">64.3%</div><div class="progress"><span style="width:64.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อรวรรณ บุญประวัติ (ใบหยก)</td>
+            <td class="money">39,950</td>
+            <td><div class="percent">42.7%</div><div class="progress"><span style="width:42.7%"></span></div></td>
+            <td class="money">53,535</td>
+            <td><div class="percent">57.3%</div><div class="progress"><span style="width:57.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปนันท์ชิตา ทำรักษา (ตั๊ก)</td>
+            <td class="money">128,986</td>
+            <td><div class="percent">43.4%</div><div class="progress"><span style="width:43.4%"></span></div></td>
+            <td class="money">168,479</td>
+            <td><div class="percent">56.6%</div><div class="progress"><span style="width:56.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พิพัฒน์พงษ์ อุดมศักดิ์ (สกาย)</td>
+            <td class="money">81,955</td>
+            <td><div class="percent">44.3%</div><div class="progress"><span style="width:44.3%"></span></div></td>
+            <td class="money">102,880</td>
+            <td><div class="percent">55.7%</div><div class="progress"><span style="width:55.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กานต์ธิดา อาดดวงดี (โบว์)</td>
+            <td class="money">38,015</td>
+            <td><div class="percent">54.0%</div><div class="progress"><span style="width:54.0%"></span></div></td>
+            <td class="money">32,440</td>
+            <td><div class="percent">46.0%</div><div class="progress"><span style="width:46.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภัทรพร พรมพินิจ (เนม)</td>
+            <td class="money">1,600</td>
+            <td><div class="percent">72.7%</div><div class="progress"><span style="width:72.7%"></span></div></td>
+            <td class="money">600</td>
+            <td><div class="percent">27.3%</div><div class="progress"><span style="width:27.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">หนึ่งฤทัย ขันแก้ว (หนึ่ง)</td>
+            <td class="money">14,300</td>
+            <td><div class="percent">90.5%</div><div class="progress"><span style="width:90.5%"></span></div></td>
+            <td class="money">1,500</td>
+            <td><div class="percent">9.5%</div><div class="progress"><span style="width:9.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ธนากร แย้มขจร (วาริท)</td>
+            <td class="money">36,410</td>
+            <td><div class="percent">94.3%</div><div class="progress"><span style="width:94.3%"></span></div></td>
+            <td class="money">2,208</td>
+            <td><div class="percent">5.7%</div><div class="progress"><span style="width:5.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภัทรสุดา จิตจะโปะ (เมย์)</td>
+            <td class="money">1,650</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">รัตนาภรณ์ วรรณทวี (ทิพย์)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปุญญิสา โคตรสุวรรณ (ปุ้ย)</td>
+            <td class="money">2,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 ปากเกร็ด</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 14 คน</span>
+        <span class="pill">เฝ้าระวัง 5 คน</span>
+        <span class="pill">ลูกค้าเก่า 53.9%</span>
+        <span class="pill">ลูกค้าใหม่ 46.1%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">วลัญชน์ชญา สงน้อย (อีฟ)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">กชกร จันทร์นวล (กัน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">บุษญาลักษณ์ แซ่โซ้ง (มิน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พิไลพร สุขดี (น้ำฟ้า)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">อัครเดช ทรัพยนิธิปกรณ์ (เก้า)</td>
+            <td class="money">59,551</td>
+            <td><div class="percent">28.6%</div><div class="progress"><span style="width:28.6%"></span></div></td>
+            <td class="money">148,815</td>
+            <td><div class="percent">71.4%</div><div class="progress"><span style="width:71.4%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ลูกเกศ ทองศุกร์แก้ว (เกด)</td>
+            <td class="money">2,590</td>
+            <td><div class="percent">31.3%</div><div class="progress"><span style="width:31.3%"></span></div></td>
+            <td class="money">5,675</td>
+            <td><div class="percent">68.7%</div><div class="progress"><span style="width:68.7%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ญาณภัทร์ เปนนาม (แสตมป์)</td>
+            <td class="money">39,225</td>
+            <td><div class="percent">51.4%</div><div class="progress"><span style="width:51.4%"></span></div></td>
+            <td class="money">37,140</td>
+            <td><div class="percent">48.6%</div><div class="progress"><span style="width:48.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">จุฑามาศ ทุมสาร (หญิง)</td>
+            <td class="money">7,350</td>
+            <td><div class="percent">57.4%</div><div class="progress"><span style="width:57.4%"></span></div></td>
+            <td class="money">5,460</td>
+            <td><div class="percent">42.6%</div><div class="progress"><span style="width:42.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปรารถนา ฮับหลี (เชอร์รี่)</td>
+            <td class="money">56,070</td>
+            <td><div class="percent">58.8%</div><div class="progress"><span style="width:58.8%"></span></div></td>
+            <td class="money">39,300</td>
+            <td><div class="percent">41.2%</div><div class="progress"><span style="width:41.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุจิตรา อภัย (ตวง)</td>
+            <td class="money">164,260</td>
+            <td><div class="percent">61.5%</div><div class="progress"><span style="width:61.5%"></span></div></td>
+            <td class="money">102,764</td>
+            <td><div class="percent">38.5%</div><div class="progress"><span style="width:38.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สายฝน กมลเลิศ (ฝน)</td>
+            <td class="money">6,610</td>
+            <td><div class="percent">63.1%</div><div class="progress"><span style="width:63.1%"></span></div></td>
+            <td class="money">3,872</td>
+            <td><div class="percent">36.9%</div><div class="progress"><span style="width:36.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภัทราวดี สาริศรี (ฟ้า)</td>
+            <td class="money">4,350</td>
+            <td><div class="percent">68.5%</div><div class="progress"><span style="width:68.5%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">31.5%</div><div class="progress"><span style="width:31.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภาพิมล อาญาเมือง (แพรว)</td>
+            <td class="money">3,000</td>
+            <td><div class="percent">68.7%</div><div class="progress"><span style="width:68.7%"></span></div></td>
+            <td class="money">1,365</td>
+            <td><div class="percent">31.3%</div><div class="progress"><span style="width:31.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นันทภัค กอกิมพงษ์ (ชาบู)</td>
+            <td class="money">98,298</td>
+            <td><div class="percent">77.1%</div><div class="progress"><span style="width:77.1%"></span></div></td>
+            <td class="money">29,269</td>
+            <td><div class="percent">22.9%</div><div class="progress"><span style="width:22.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-grid">
+        <div class="summary-card"><div class="label">จำนวนพนักงานในกลุ่มนี้</div><div class="value">77 คน</div></div>
+        <div class="summary-card"><div class="label">จำนวนที่น่าเป็นห่วง</div><div class="value">28 คน</div></div>
+        <div class="summary-card"><div class="label">อัตราเสี่ยงของกลุ่ม</div><div class="value">36.4%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าเก่า</div><div class="value">41.4%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าใหม่</div><div class="value">58.6%</div></div>
+      </div>
+      <div class="analysis-box">
+        <b>สรุปสถานการณ์:</b> สถานการณ์ควรติดตามใกล้ชิด — พบพนักงานที่น่าเป็นห่วง 28 คน จากทั้งหมด 77 คน ในกลุ่มสาขานี้<br>
+        <b>แนวทางแก้ไข:</b> ควรติดตามรายสัปดาห์: แยกลิสต์ลูกค้าเก่าที่ไม่ได้กลับมา, ให้พนักงานโทร/แชทติดตามหลังบริการ, วางโปรแกรมดูแลต่อเนื่อง และให้ผู้จัดการเช็กสัดส่วนลูกค้าเก่ารายบุคคลทุก 3 วัน
+      </div>
+    </div>
+  </section>
+
+  <section class="group">
+    <div class="group-head">
+      <div class="group-title">
+        <h2>💎 กลุ่มที่ 3: กลุ่มสาขา Premium / Expansion 5 สาขา</h2>
+        <p>สุขุมวิท 39 • บางใหญ่ • ราชพฤกษ์ • สายไหม • ร่มเกล้า</p>
+      </div>
+      <div class="group-badge">สรุปกลุ่ม 3</div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 สุขุมวิท 39</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 11 คน</span>
+        <span class="pill">เฝ้าระวัง 3 คน</span>
+        <span class="pill">ลูกค้าเก่า 36.8%</span>
+        <span class="pill">ลูกค้าใหม่ 63.2%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">เบญญาภา ตันเจริญ (เบญ)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ณัฏฐ์นลิน พิเดช (นิวเยียร์)</td>
+            <td class="money">2,995</td>
+            <td><div class="percent">8.2%</div><div class="progress"><span style="width:8.2%"></span></div></td>
+            <td class="money">33,750</td>
+            <td><div class="percent">91.8%</div><div class="progress"><span style="width:91.8%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">เจนจิรา เจริญดง (แอมเม่)</td>
+            <td class="money">79,655</td>
+            <td><div class="percent">26.5%</div><div class="progress"><span style="width:26.5%"></span></div></td>
+            <td class="money">220,637</td>
+            <td><div class="percent">73.5%</div><div class="progress"><span style="width:73.5%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">อภิรดี ทิมทอง (มุก)</td>
+            <td class="money">57,050</td>
+            <td><div class="percent">37.7%</div><div class="progress"><span style="width:37.7%"></span></div></td>
+            <td class="money">94,438</td>
+            <td><div class="percent">62.3%</div><div class="progress"><span style="width:62.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อัครกิตติ์ บุญยชัยธนรัตน์ (พี่กิต)</td>
+            <td class="money">94,915</td>
+            <td><div class="percent">46.7%</div><div class="progress"><span style="width:46.7%"></span></div></td>
+            <td class="money">108,200</td>
+            <td><div class="percent">53.3%</div><div class="progress"><span style="width:53.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">เมธินี ตันสิงห์ (โบว์)</td>
+            <td class="money">4,000</td>
+            <td><div class="percent">70.3%</div><div class="progress"><span style="width:70.3%"></span></div></td>
+            <td class="money">1,690</td>
+            <td><div class="percent">29.7%</div><div class="progress"><span style="width:29.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุภัทรา วงษ์พินิจ (เอิน)</td>
+            <td class="money">18,090</td>
+            <td><div class="percent">88.3%</div><div class="progress"><span style="width:88.3%"></span></div></td>
+            <td class="money">2,400</td>
+            <td><div class="percent">11.7%</div><div class="progress"><span style="width:11.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">แดนจิรา แสงศักดิ์ (พิม)</td>
+            <td class="money">1,200</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อัญญาดา ศรีบุญมี (ขวัญ)</td>
+            <td class="money">1,690</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พรทิพย์ รูปพรรณ์ (นิว)</td>
+            <td class="money">8,070</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อั้อยใจ สุประทัศ (อ้อย)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 บางใหญ่</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 18 คน</span>
+        <span class="pill">เฝ้าระวัง 8 คน</span>
+        <span class="pill">ลูกค้าเก่า 55.8%</span>
+        <span class="pill">ลูกค้าใหม่ 44.2%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">ทฤฒมน ดีวรัตน์ (ปอย)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">วิลาวัลย์ ภักดีโยธา (เอ็นเตอร์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ธนัญญา เย็นแพง (หนิว)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">วรรณิภา ผันผ่อน (ฟ้า)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ณิชนันทน์ เล็กธนู (ทิพย์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ปนัดดา ปาทะหา (เอิร์น)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ฐิตาภา ขจรศิริกุล (โบว์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ธัญญา นวลอินทร์ (น้ำข้าว)</td>
+            <td class="money">1,990</td>
+            <td><div class="percent">24.9%</div><div class="progress"><span style="width:24.9%"></span></div></td>
+            <td class="money">6,000</td>
+            <td><div class="percent">75.1%</div><div class="progress"><span style="width:75.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">รสลิน สอนคุ้ม (โรส)</td>
+            <td class="money">94,115</td>
+            <td><div class="percent">44.3%</div><div class="progress"><span style="width:44.3%"></span></div></td>
+            <td class="money">118,215</td>
+            <td><div class="percent">55.7%</div><div class="progress"><span style="width:55.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กรพินธุ์ เสาวภาคย์ (ก้อย)</td>
+            <td class="money">257,415</td>
+            <td><div class="percent">47.5%</div><div class="progress"><span style="width:47.5%"></span></div></td>
+            <td class="money">284,620</td>
+            <td><div class="percent">52.5%</div><div class="progress"><span style="width:52.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ศฤงคาร ใจเหล็ก (แจ๊ค)</td>
+            <td class="money">214,700</td>
+            <td><div class="percent">56.5%</div><div class="progress"><span style="width:56.5%"></span></div></td>
+            <td class="money">165,275</td>
+            <td><div class="percent">43.5%</div><div class="progress"><span style="width:43.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ศุภิกา อินมูลน้อย (ซี)</td>
+            <td class="money">397,835</td>
+            <td><div class="percent">63.2%</div><div class="progress"><span style="width:63.2%"></span></div></td>
+            <td class="money">231,530</td>
+            <td><div class="percent">36.8%</div><div class="progress"><span style="width:36.8%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ณภัค รอดกสิกรรม ( นิว )</td>
+            <td class="money">6,000</td>
+            <td><div class="percent">75.0%</div><div class="progress"><span style="width:75.0%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">25.0%</div><div class="progress"><span style="width:25.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นิภารัตน์ รุ่งเรือง (โบว์)</td>
+            <td class="money">16,420</td>
+            <td><div class="percent">75.6%</div><div class="progress"><span style="width:75.6%"></span></div></td>
+            <td class="money">5,300</td>
+            <td><div class="percent">24.4%</div><div class="progress"><span style="width:24.4%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">เพ็ญพิชชา ใจหาญ (พลอย)</td>
+            <td class="money">2,500</td>
+            <td><div class="percent">83.3%</div><div class="progress"><span style="width:83.3%"></span></div></td>
+            <td class="money">500</td>
+            <td><div class="percent">16.7%</div><div class="progress"><span style="width:16.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ศิริญญา สาระคำ ( วุ้นเส้น)</td>
+            <td class="money">29,470</td>
+            <td><div class="percent">84.8%</div><div class="progress"><span style="width:84.8%"></span></div></td>
+            <td class="money">5,270</td>
+            <td><div class="percent">15.2%</div><div class="progress"><span style="width:15.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กานต์พิชชา โศภณณัฐกิตต์ (นก)</td>
+            <td class="money">12,860</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อรกัญญา ขวัญเมือง (โนเนม)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 ราชพฤกษ์</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 16 คน</span>
+        <span class="pill">เฝ้าระวัง 4 คน</span>
+        <span class="pill">ลูกค้าเก่า 55.4%</span>
+        <span class="pill">ลูกค้าใหม่ 44.6%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">อรวรรณ แสนสวย (มาร์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">1,200</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พนิตกาญจน์ สวรรณล้ำ (มิ้ว)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ศุภตา แก้วอาสา (ไอซ์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">พาขวัญ กลิ่นประทุม(ดรีม)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ศุภิกา อินมูลน้อย (ซี)</td>
+            <td class="money">11,800</td>
+            <td><div class="percent">36.0%</div><div class="progress"><span style="width:36.0%"></span></div></td>
+            <td class="money">21,000</td>
+            <td><div class="percent">64.0%</div><div class="progress"><span style="width:64.0%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปะริยดา ภูอาลัย (มด)</td>
+            <td class="money">118,412</td>
+            <td><div class="percent">40.7%</div><div class="progress"><span style="width:40.7%"></span></div></td>
+            <td class="money">172,620</td>
+            <td><div class="percent">59.3%</div><div class="progress"><span style="width:59.3%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สหรัฐ พรพิพัฒน์วงศ์ (เกิ้ล)</td>
+            <td class="money">155,445</td>
+            <td><div class="percent">52.9%</div><div class="progress"><span style="width:52.9%"></span></div></td>
+            <td class="money">138,535</td>
+            <td><div class="percent">47.1%</div><div class="progress"><span style="width:47.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">จุฑามาศ เรียนรู้(เลย์)</td>
+            <td class="money">7,790</td>
+            <td><div class="percent">55.8%</div><div class="progress"><span style="width:55.8%"></span></div></td>
+            <td class="money">6,180</td>
+            <td><div class="percent">44.2%</div><div class="progress"><span style="width:44.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ธัญญาพร สาแก้ว(พลอย)</td>
+            <td class="money">2,690</td>
+            <td><div class="percent">58.6%</div><div class="progress"><span style="width:58.6%"></span></div></td>
+            <td class="money">1,900</td>
+            <td><div class="percent">41.4%</div><div class="progress"><span style="width:41.4%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุพัฒตรา ตุ๋ยเทพ (ซินดี้)</td>
+            <td class="money">235,167</td>
+            <td><div class="percent">60.1%</div><div class="progress"><span style="width:60.1%"></span></div></td>
+            <td class="money">156,365</td>
+            <td><div class="percent">39.9%</div><div class="progress"><span style="width:39.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุภา ใจบุญ (แก้ม)</td>
+            <td class="money">217,731</td>
+            <td><div class="percent">60.5%</div><div class="progress"><span style="width:60.5%"></span></div></td>
+            <td class="money">142,220</td>
+            <td><div class="percent">39.5%</div><div class="progress"><span style="width:39.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">นฤมล อิ่มเพชร (กล้วย)</td>
+            <td class="money">3,300</td>
+            <td><div class="percent">62.3%</div><div class="progress"><span style="width:62.3%"></span></div></td>
+            <td class="money">2,000</td>
+            <td><div class="percent">37.7%</div><div class="progress"><span style="width:37.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ภาคิน ดิษฐี (เนป)</td>
+            <td class="money">46,435</td>
+            <td><div class="percent">85.5%</div><div class="progress"><span style="width:85.5%"></span></div></td>
+            <td class="money">7,890</td>
+            <td><div class="percent">14.5%</div><div class="progress"><span style="width:14.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ดุจขวัญ ไผ่เส้ง (มุก)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">มณฑิตา ทรงนพรัตน์ (เปียโน)</td>
+            <td class="money">1,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พนิดา ภูมิกระโทก(กีกี้)</td>
+            <td class="money">4,970</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 สายไหม</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 16 คน</span>
+        <span class="pill">เฝ้าระวัง 5 คน</span>
+        <span class="pill">ลูกค้าเก่า 46.2%</span>
+        <span class="pill">ลูกค้าใหม่ 53.8%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">ฟ้ารุ่ง มุกค์ทรัพย์(ตะวัน)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">18,000</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">ทิฆัมพร เสบสบาย (ซีซี)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">89,880</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">นิรัชพร ทองสุข (มายด์)</td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">เจษฎาพร ดาวขุนทด (พลอย)</td>
+            <td class="money">2,500</td>
+            <td><div class="percent">23.8%</div><div class="progress"><span style="width:23.8%"></span></div></td>
+            <td class="money">8,000</td>
+            <td><div class="percent">76.2%</div><div class="progress"><span style="width:76.2%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-danger">
+            <td class="employee">วรธันย์ กานุมาน (สวอท)</td>
+            <td class="money">110,130</td>
+            <td><div class="percent">29.9%</div><div class="progress"><span style="width:29.9%"></span></div></td>
+            <td class="money">257,735</td>
+            <td><div class="percent">70.1%</div><div class="progress"><span style="width:70.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">อุรัสยา คำประเสริฐ (เอ็ม)</td>
+            <td class="money">4,000</td>
+            <td><div class="percent">33.3%</div><div class="progress"><span style="width:33.3%"></span></div></td>
+            <td class="money">8,000</td>
+            <td><div class="percent">66.7%</div><div class="progress"><span style="width:66.7%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ชไมพร กันสุ่ม (แพท)</td>
+            <td class="money">30,700</td>
+            <td><div class="percent">34.8%</div><div class="progress"><span style="width:34.8%"></span></div></td>
+            <td class="money">57,520</td>
+            <td><div class="percent">65.2%</div><div class="progress"><span style="width:65.2%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="row-caution">
+            <td class="employee">ณัฐศิณี ศิริพงศ์รุจี (นัตตี้)</td>
+            <td class="money">100,348</td>
+            <td><div class="percent">35.7%</div><div class="progress"><span style="width:35.7%"></span></div></td>
+            <td class="money">180,776</td>
+            <td><div class="percent">64.3%</div><div class="progress"><span style="width:64.3%"></span></div></td>
+            <td><span class="status caution">🟡 ควรติดตาม</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุดตา นุสนทลา (เบียร์)</td>
+            <td class="money">4,790</td>
+            <td><div class="percent">47.9%</div><div class="progress"><span style="width:47.9%"></span></div></td>
+            <td class="money">5,200</td>
+            <td><div class="percent">52.1%</div><div class="progress"><span style="width:52.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">สุนันทา เกิดเทวา (ชมพู่)</td>
+            <td class="money">245,319</td>
+            <td><div class="percent">59.3%</div><div class="progress"><span style="width:59.3%"></span></div></td>
+            <td class="money">168,682</td>
+            <td><div class="percent">40.7%</div><div class="progress"><span style="width:40.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พัทธน์นท สมัยสุดตา(เฟิร์น)</td>
+            <td class="money">5,000</td>
+            <td><div class="percent">60.5%</div><div class="progress"><span style="width:60.5%"></span></div></td>
+            <td class="money">3,270</td>
+            <td><div class="percent">39.5%</div><div class="progress"><span style="width:39.5%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">จันทกานต์ เวียงอินทร์ (จิ๋ว)</td>
+            <td class="money">18,900</td>
+            <td><div class="percent">64.9%</div><div class="progress"><span style="width:64.9%"></span></div></td>
+            <td class="money">10,200</td>
+            <td><div class="percent">35.1%</div><div class="progress"><span style="width:35.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">อรญา แสงนิล (อีฟ)</td>
+            <td class="money">277,463</td>
+            <td><div class="percent">67.3%</div><div class="progress"><span style="width:67.3%"></span></div></td>
+            <td class="money">134,813</td>
+            <td><div class="percent">32.7%</div><div class="progress"><span style="width:32.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">หทัยชนก (ขวัญ)</td>
+            <td class="money">4,000</td>
+            <td><div class="percent">70.3%</div><div class="progress"><span style="width:70.3%"></span></div></td>
+            <td class="money">1,690</td>
+            <td><div class="percent">29.7%</div><div class="progress"><span style="width:29.7%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กุสุณี สองเมือง (มิ้นท์)</td>
+            <td class="money">3,500</td>
+            <td><div class="percent">77.8%</div><div class="progress"><span style="width:77.8%"></span></div></td>
+            <td class="money">1,000</td>
+            <td><div class="percent">22.2%</div><div class="progress"><span style="width:22.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">พรญารัตน์ บราฮีม (คริส)</td>
+            <td class="money">3,500</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="branch">
+      <h3>🏢 ร่มเกล้า</h3>
+      <div class="branch-stats">
+        <span class="pill">พนักงาน 12 คน</span>
+        <span class="pill">เฝ้าระวัง 1 คน</span>
+        <span class="pill">ลูกค้าเก่า 45.4%</span>
+        <span class="pill">ลูกค้าใหม่ 54.6%</span>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>พนักงาน</th>
+            <th>ยอดขายลูกค้าเก่า</th>
+            <th>% ลูกค้าเก่า</th>
+            <th>ยอดขายลูกค้าใหม่</th>
+            <th>% ลูกค้าใหม่</th>
+            <th>สถานะ</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr class="row-danger">
+            <td class="employee">วรัตน์ดา สาระบัว (ฝ้าย)</td>
+            <td class="money">8,200</td>
+            <td><div class="percent">22.9%</div><div class="progress"><span style="width:22.9%"></span></div></td>
+            <td class="money">27,600</td>
+            <td><div class="percent">77.1%</div><div class="progress"><span style="width:77.1%"></span></div></td>
+            <td><span class="status danger">🔴 เฝ้าระวัง</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ทิฆัมพร เสบสบาย (ซีซี)</td>
+            <td class="money">251,675</td>
+            <td><div class="percent">41.1%</div><div class="progress"><span style="width:41.1%"></span></div></td>
+            <td class="money">360,035</td>
+            <td><div class="percent">58.9%</div><div class="progress"><span style="width:58.9%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ฟ้ารุ่ง มุกค์ทรัพย์ (ตะวัน)</td>
+            <td class="money">163,345</td>
+            <td><div class="percent">42.4%</div><div class="progress"><span style="width:42.4%"></span></div></td>
+            <td class="money">221,640</td>
+            <td><div class="percent">57.6%</div><div class="progress"><span style="width:57.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ปิยะวรรณ ภู่สุวรรณ (ปูนา)</td>
+            <td class="money">133,060</td>
+            <td><div class="percent">46.9%</div><div class="progress"><span style="width:46.9%"></span></div></td>
+            <td class="money">150,845</td>
+            <td><div class="percent">53.1%</div><div class="progress"><span style="width:53.1%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ศศิตา ไชยศรีษะ (สุกี้)</td>
+            <td class="money">181,015</td>
+            <td><div class="percent">48.4%</div><div class="progress"><span style="width:48.4%"></span></div></td>
+            <td class="money">193,205</td>
+            <td><div class="percent">51.6%</div><div class="progress"><span style="width:51.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">รัตนาภรณ์ ดวงสวง (แคท)</td>
+            <td class="money">40,585</td>
+            <td><div class="percent">52.0%</div><div class="progress"><span style="width:52.0%"></span></div></td>
+            <td class="money">37,485</td>
+            <td><div class="percent">48.0%</div><div class="progress"><span style="width:48.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กัลญารัตน์ ทับสอน (เหม่ยเฟิร์น)</td>
+            <td class="money">7,999</td>
+            <td><div class="percent">54.8%</div><div class="progress"><span style="width:54.8%"></span></div></td>
+            <td class="money">6,600</td>
+            <td><div class="percent">45.2%</div><div class="progress"><span style="width:45.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ณัฏฐ์ชุดา ตรังค์รัตนนิยม (ดาว)</td>
+            <td class="money">21,650</td>
+            <td><div class="percent">57.4%</div><div class="progress"><span style="width:57.4%"></span></div></td>
+            <td class="money">16,070</td>
+            <td><div class="percent">42.6%</div><div class="progress"><span style="width:42.6%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">จลัลพร แก้วนิล (ปาร์ตี้)</td>
+            <td class="money">5,200</td>
+            <td><div class="percent">77.6%</div><div class="progress"><span style="width:77.6%"></span></div></td>
+            <td class="money">1,500</td>
+            <td><div class="percent">22.4%</div><div class="progress"><span style="width:22.4%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">กรรณิการ์ กรัดกลาง (ลูกปลา)</td>
+            <td class="money">24,650</td>
+            <td><div class="percent">81.8%</div><div class="progress"><span style="width:81.8%"></span></div></td>
+            <td class="money">5,500</td>
+            <td><div class="percent">18.2%</div><div class="progress"><span style="width:18.2%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ประภัสสร สายสมนึก (กิ๊ฟ)</td>
+            <td class="money">4,590</td>
+            <td><div class="percent">92.0%</div><div class="progress"><span style="width:92.0%"></span></div></td>
+            <td class="money">400</td>
+            <td><div class="percent">8.0%</div><div class="progress"><span style="width:8.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+          <tr class="">
+            <td class="employee">ธันย์ชนก จันทร์สว่าง (ตอง)</td>
+            <td class="money">6,200</td>
+            <td><div class="percent">100.0%</div><div class="progress"><span style="width:100.0%"></span></div></td>
+            <td class="money">0</td>
+            <td><div class="percent">0.0%</div><div class="progress"><span style="width:0.0%"></span></div></td>
+            <td><span class="status safe">🟢 ปกติ</span></td>
+          </tr>
+
+        </tbody>
+      </table>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-grid">
+        <div class="summary-card"><div class="label">จำนวนพนักงานในกลุ่มนี้</div><div class="value">73 คน</div></div>
+        <div class="summary-card"><div class="label">จำนวนที่น่าเป็นห่วง</div><div class="value">21 คน</div></div>
+        <div class="summary-card"><div class="label">อัตราเสี่ยงของกลุ่ม</div><div class="value">28.8%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าเก่า</div><div class="value">49.2%</div></div>
+        <div class="summary-card"><div class="label">สัดส่วนลูกค้าใหม่</div><div class="value">50.8%</div></div>
+      </div>
+      <div class="analysis-box">
+        <b>สรุปสถานการณ์:</b> สถานการณ์ควรติดตามใกล้ชิด — พบพนักงานที่น่าเป็นห่วง 21 คน จากทั้งหมด 73 คน ในกลุ่มสาขานี้<br>
+        <b>แนวทางแก้ไข:</b> ควรติดตามรายสัปดาห์: แยกลิสต์ลูกค้าเก่าที่ไม่ได้กลับมา, ให้พนักงานโทร/แชทติดตามหลังบริการ, วางโปรแกรมดูแลต่อเนื่อง และให้ผู้จัดการเช็กสัดส่วนลูกค้าเก่ารายบุคคลทุก 3 วัน
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">Mersi Clinic • Sales Mix Monitoring Dashboard • Old Customer Ratio Alert &lt; 30%</div>
+</div>
+</body>
+</html>
